@@ -2,41 +2,41 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - projectdesenvovimento
+name: Build and deploy Python app to Azure Web App - projectdesenvovimento #so o nome do que ta fazendo
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: #quando
+  push: #tiver um push
+    branches: #na branch 
+      - main #apenas na branch main
+  workflow_dispatch: #permite o github rodar ele no actions
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read #This is required for actions/checkout
+jobs: #o que ele vai fazer
+  build: #passar de codigo normal para de maquina
+    runs-on: ubuntu-latest #feito no ubunto
+    permissions: #permissões
+      contents: read #ele le o repositorio
 
-    steps:
-      - uses: actions/checkout@v4
+    steps: #todos os passo que vai fazer
+      - uses: actions/checkout@v4 #baixa o codigo na maquina que vai rodar isso tudo
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
+      - name: Set up Python version #nome do que vai fazer
+        uses: actions/setup-python@v5 #configura o python
+        with: # a versão
+          python-version: '3.14' # a versão
 
       # 🛠️ Local Build Section (Optional)
       # The following section in your workflow is designed to catch build issues early on the client side, before deployment. This can be helpful for debugging and validation. However, if this step significantly increases deployment time and early detection is not critical for your workflow, you may remove this section to streamline the deployment process.
-      - name: Create and Start virtual environment and Install dependencies
-        run: |
-          python -m venv antenv
+      - name: Create and Start virtual environment and Install dependencies #nome
+        run: | #vai rodar todas dependencias, cria venv,ativa venv e instala todas as dependecias
+          python -m venv antenv 
           source antenv/bin/activate
           pip install -r requirements.txt
                 
       # By default, when you enable GitHub CI/CD integration through the Azure portal, the platform automatically sets the SCM_DO_BUILD_DURING_DEPLOYMENT application setting to true. This triggers the use of Oryx, a build engine that handles application compilation and dependency installation (e.g., pip install) directly on the platform during deployment. Hence, we exclude the antenv virtual environment directory from the deployment artifact to reduce the payload size. 
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
+      - name: Upload artifact for deployment jobs #nome
+        uses: actions/upload-artifact@v4 #salva os arquivos
         with:
-          name: python-app
+          name: python-app #nome e salva tudo menos o !antenv/
           path: |
             .
             !antenv/
@@ -47,30 +47,30 @@ jobs:
       # 2. Refer to sample workflows for alternative deployment strategies: https://github.com/Azure/actions-workflow-samples/tree/master/AppService
       
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+  deploy: #deploy
+    runs-on: ubuntu-latest #roda no ubunto
+    needs: build #precisa esperar o build acabar
+    permissions: #permições
+      id-token: write #escrever para coisas da azure
+      contents: read #ler o repositorio
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+    steps: # passos que vai fazer
+      - name: Download artifact from build job #nome
+        uses: actions/download-artifact@v4 #baixa o que foi feito na build
         with:
-          name: python-app
+          name: python-app #nome
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
+      - name: Login to Azure #nome
+        uses: azure/login@v2 #login na azure
+        with: #variaveis para login
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A2373787A3AB4F4ABACD7BF973850D9C }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B5D2922662214AFAB504E2D6D10521E7 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_30121C82975349D1923D6C224338C891 }}
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
-        with:
+      - name: 'Deploy to Azure Web App' # nome
+        uses: azure/webapps-deploy@v3 #envia para azure
+        id: deploy-to-webapp 
+        with: #informações para azure
           app-name: 'projectdesenvovimento'
           slot-name: 'Production'
           
